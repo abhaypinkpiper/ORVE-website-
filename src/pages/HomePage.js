@@ -76,9 +76,10 @@ function TypewriterText({ texts, style }) {
   return <span style={style}>{displayed}<span style={{ color: '#C9A84C', animation: 'blink 1s infinite' }}>|</span></span>;
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
   const [hovered, setHovered] = useState(false);
+  const productHref = Number.isInteger(productIndex) && productIndex >= 0 ? `/product/${productIndex}` : null;
 
   return (
     <div
@@ -88,15 +89,29 @@ function ProductCard({ product }) {
       onMouseLeave={() => setHovered(false)}
     >
       <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4' }}>
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            transition: 'transform 0.6s ease',
-            transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          }}
-        />
+        {productHref ? (
+          <Link to={productHref} style={{ display: 'block' }}>
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{
+                width: '100%', height: '100%', objectFit: 'cover',
+                transition: 'transform 0.6s ease',
+                transform: hovered ? 'scale(1.08)' : 'scale(1)',
+              }}
+            />
+          </Link>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              transition: 'transform 0.6s ease',
+              transform: hovered ? 'scale(1.08)' : 'scale(1)',
+            }}
+          />
+        )}
         {!product.inStock && (
           <div style={{
             position: 'absolute', top: '16px', left: '16px',
@@ -143,7 +158,13 @@ function ProductCard({ product }) {
       </div>
       <div style={{ padding: '20px 16px', background: '#FFFDF7' }}>
         <p style={{ fontSize: '0.6rem', letterSpacing: '3px', color: '#A07830', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px' }}>{product.category}</p>
-        <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+        {productHref ? (
+          <Link to={productHref} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+          </Link>
+        ) : (
+          <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.2rem', color: '#C9A84C', fontWeight: 600 }}>₹{product.price.toLocaleString()}</span>
           {product.originalPrice && (
@@ -310,7 +331,7 @@ export default function HomePage() {
             <h2 className="section-title" style={{ color: '#2C1A0E' }}>Featured Pieces</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
-            {featured.map(product => <ProductCard key={product.id} product={product} />)}
+            {featured.map(product => <ProductCard key={product.id} product={product} productIndex={products.findIndex(p => p.id === product.id)} />)}
           </div>
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
             <Link to="/shop" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>View All Collections</Link>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
-function ProductCard({ product }) {
+function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
   const [hovered, setHovered] = useState(false);
+
+  const productHref = Number.isInteger(productIndex) && productIndex >= 0 ? `/product/${productIndex}` : null;
 
   return (
     <div
@@ -19,16 +21,31 @@ function ProductCard({ product }) {
       }}
     >
       <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            transition: 'transform 0.6s ease',
-            transform: hovered ? 'scale(1.08)' : 'scale(1)',
-            filter: !product.inStock ? 'grayscale(30%)' : 'none',
-          }}
-        />
+        {productHref ? (
+          <Link to={productHref} style={{ display: 'block' }}>
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{
+                width: '100%', height: '100%', objectFit: 'cover',
+                transition: 'transform 0.6s ease',
+                transform: hovered ? 'scale(1.08)' : 'scale(1)',
+                filter: !product.inStock ? 'grayscale(30%)' : 'none',
+              }}
+            />
+          </Link>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              transition: 'transform 0.6s ease',
+              transform: hovered ? 'scale(1.08)' : 'scale(1)',
+              filter: !product.inStock ? 'grayscale(30%)' : 'none',
+            }}
+          />
+        )}
         {!product.inStock && (
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -79,11 +96,19 @@ function ProductCard({ product }) {
       </div>
       <div style={{ padding: '20px' }}>
         <p style={{ fontSize: '0.55rem', letterSpacing: '3px', color: '#A07830', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px' }}>{product.category}</p>
-        <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 500, letterSpacing: '1px', marginBottom: '10px' }}>{product.name}</h3>
+        {productHref ? (
+          <Link to={productHref} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 500, letterSpacing: '1px', marginBottom: '10px' }}>{product.name}</h3>
+          </Link>
+        ) : (
+          <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 500, letterSpacing: '1px', marginBottom: '10px' }}>{product.name}</h3>
+        )}
         <p style={{ fontSize: '0.78rem', color: '#6B5540', lineHeight: 1.7, marginBottom: '12px' }}>{product.description}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
           <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', color: '#C9A84C', fontWeight: 600 }}>₹{product.price.toLocaleString()}</span>
-          <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>₹{product.originalPrice?.toLocaleString()}</span>
+          {product.originalPrice != null && (
+            <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>₹{product.originalPrice.toLocaleString()}</span>
+          )}
         </div>
         <div style={{ color: '#C9A84C', fontSize: '0.8rem' }}>
           {'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}
@@ -119,6 +144,8 @@ export default function ShopPage() {
   if (sort === 'price-asc') filtered = [...filtered].sort((a, b) => a.price - b.price);
   else if (sort === 'price-desc') filtered = [...filtered].sort((a, b) => b.price - a.price);
   else if (sort === 'rating') filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+
+  const indexById = new Map(products.map((p, i) => [p.id, i]));
 
   return (
     <div style={{ minHeight: '100vh', paddingTop: '100px', background: '#F5EFE0' }}>
@@ -218,7 +245,7 @@ export default function ShopPage() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '28px' }}>
-            {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+            {filtered.map(p => <ProductCard key={p.id} product={p} productIndex={indexById.get(p.id)} />)}
           </div>
         )}
       </div>
