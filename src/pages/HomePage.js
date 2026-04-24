@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
 function GoldParticles() {
@@ -76,27 +76,52 @@ function TypewriterText({ texts, style }) {
   return <span style={style}>{displayed}<span style={{ color: '#C9A84C', animation: 'blink 1s infinite' }}>|</span></span>;
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
   const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+  const productHref = Number.isInteger(productIndex) && productIndex >= 0 ? `/product/${productIndex}` : null;
+  const goToProduct = () => {
+    if (productHref) navigate(productHref);
+  };
 
   return (
     <div
       className="product-card"
-      style={{ borderRadius: '2px', overflow: 'hidden' }}
+      style={{ borderRadius: '2px', overflow: 'hidden', cursor: productHref ? 'pointer' : 'default' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={goToProduct}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') goToProduct();
+      }}
+      role={productHref ? 'button' : undefined}
+      tabIndex={productHref ? 0 : undefined}
     >
       <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4' }}>
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            transition: 'transform 0.6s ease',
-            transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          }}
-        />
+        {productHref ? (
+          <Link to={productHref} style={{ display: 'block' }}>
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{
+                width: '100%', height: '100%', objectFit: 'cover',
+                transition: 'transform 0.6s ease',
+                transform: hovered ? 'scale(1.08)' : 'scale(1)',
+              }}
+            />
+          </Link>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              transition: 'transform 0.6s ease',
+              transform: hovered ? 'scale(1.08)' : 'scale(1)',
+            }}
+          />
+        )}
         {!product.inStock && (
           <div style={{
             position: 'absolute', top: '16px', left: '16px',
@@ -123,13 +148,15 @@ function ProductCard({ product }) {
           }}>
             {product.inStock ? (
               <>
-                <button className="btn-gold" onClick={() => addToCart(product)}
+                <button className="btn-gold" onClick={(e) => { e.stopPropagation(); addToCart(product); }}
                   style={{ fontSize: '0.65rem', padding: '10px 24px', letterSpacing: '2px' }}>
                   Add to Bag
                 </button>
                 <a href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20buy%20${encodeURIComponent(product.name)}%20(₹${product.price}).%20Please%20confirm%20availability.`}
                   target="_blank" rel="noreferrer"
-                  style={{ textDecoration: 'none' }}>
+                  style={{ textDecoration: 'none' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button className="btn-outline" style={{ fontSize: '0.65rem', padding: '10px 24px', letterSpacing: '2px', borderColor: '#E8D5A3', color: '#E8D5A3' }}>
                     Buy on WhatsApp
                   </button>
@@ -143,7 +170,13 @@ function ProductCard({ product }) {
       </div>
       <div style={{ padding: '20px 16px', background: '#FFFDF7' }}>
         <p style={{ fontSize: '0.6rem', letterSpacing: '3px', color: '#A07830', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px' }}>{product.category}</p>
-        <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+        {productHref ? (
+          <Link to={productHref} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+          </Link>
+        ) : (
+          <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>{product.name}</h3>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.2rem', color: '#C9A84C', fontWeight: 600 }}>₹{product.price.toLocaleString()}</span>
           {product.originalPrice && (
@@ -160,7 +193,8 @@ function ProductCard({ product }) {
 
 export default function HomePage() {
   const { products } = useStore();
-  const featured = products.filter(p => p.featured).slice(0, 6);
+  const featured = (products.filter(p => p.featured).length > 0 ? products.filter(p => p.featured) : products).slice(0, 6);
+  console.log(featured)
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -309,7 +343,7 @@ export default function HomePage() {
             <h2 className="section-title" style={{ color: '#2C1A0E' }}>Featured Pieces</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
-            {featured.map(product => <ProductCard key={product.id} product={product} />)}
+            {featured.map(product => <ProductCard key={product.id} product={product} productIndex={products.findIndex(p => p.id === product.id)} />)}
           </div>
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
             <Link to="/shop" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>View All Collections</Link>

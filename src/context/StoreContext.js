@@ -2,16 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StoreContext = createContext();
 
-const INITIAL_PRODUCTS = [
-  { id: 1, name: "Celeste Layered Necklace", category: "Necklaces", price: 1499, originalPrice: 2199, image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80", description: "Delicate multi-layer gold chain with pearl drop pendant. Anti-tarnish coated for lasting brilliance.", stock: 15, inStock: true, featured: true, rating: 4.8, reviews: 24 },
-  { id: 2, name: "Aurora Statement Ring", category: "Rings", price: 899, originalPrice: 1299, image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80", description: "Bold geometric ring with faux diamond cluster. Adjustable band fits sizes 6–9.", stock: 22, inStock: true, featured: true, rating: 4.7, reviews: 18 },
-  { id: 3, name: "Lumière Drop Earrings", category: "Earrings", price: 699, originalPrice: 999, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&q=80", description: "Long cascading gold drops with crystal detailing. Lightweight and hypoallergenic.", stock: 8, inStock: true, featured: true, rating: 4.9, reviews: 31 },
-  { id: 4, name: "Velvet Cuff Bracelet", category: "Bracelets", price: 1199, originalPrice: 1699, image: "https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&q=80", description: "Wide gold cuff with intricate laser-cut floral motif. A statement on its own.", stock: 5, inStock: true, featured: false, rating: 4.6, reviews: 12 },
-  { id: 5, name: "Celestial Choker Set", category: "Sets", price: 2499, originalPrice: 3499, image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80", description: "Matching choker necklace and stud earrings set with moon & star motifs.", stock: 0, inStock: false, featured: true, rating: 4.8, reviews: 9 },
-  { id: 6, name: "Soleil Stud Earrings", category: "Earrings", price: 499, originalPrice: 749, image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&q=80", description: "Mini sunburst stud earrings in 18K gold-plated brass. Everyday luxury.", stock: 30, inStock: true, featured: false, rating: 4.5, reviews: 42 },
-  { id: 7, name: "Maharani Jhumka Set", category: "Sets", price: 1899, originalPrice: 2699, image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80", description: "Traditional Indian jhumka earrings with contemporary gold finish. Festival-ready elegance.", stock: 12, inStock: true, featured: true, rating: 4.9, reviews: 55 },
-  { id: 8, name: "Rivière Tennis Bracelet", category: "Bracelets", price: 1699, originalPrice: 2299, image: "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=80", description: "Classic diamond-cut crystal tennis bracelet in lustrous gold. Timeless sophistication.", stock: 7, inStock: true, featured: false, rating: 4.7, reviews: 19 },
-];
+const SHEETS_API_KEY = process.env.REACT_APP_GOOGLE_SHEETS_API_KEY;
+const SHEETS_SPREADSHEET_ID = process.env.REACT_APP_GOOGLE_SHEET_ID;
+const SHEETS_RANGE = process.env.REACT_APP_GOOGLE_SHEET_RANGE || 'Products!A2:G';
 
 const INITIAL_ORDERS = [
   { id: "ORV-001", customer: "Priya Sharma", phone: "9876543210", product: "Celeste Layered Necklace", amount: 1499, status: "Delivered", date: "2025-04-10", address: "Mumbai, Maharashtra" },
@@ -26,11 +19,106 @@ const INITIAL_REVIEWS = [
   { id: 3, name: "Riya K.", product: "Maharani Jhumka Set", rating: 5, comment: "Wore these for Diwali and they were the talk of the party. Luxury at an amazing price.", date: "2025-04-01", approved: true },
 ];
 
-export function StoreProvider({ children }) {
-  const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('orve_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+function parseOfferEnabled(value) {
+  if (typeof value === 'boolean') return value;
+  const s = String(value ?? '').trim().toLowerCase();
+  return s === 'true' || s === '1' || s === 'yes' || s === 'y' || s === 'enabled' || s === 'on';
+}
+
+function parseNumber(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  const s = String(value ?? '').trim();
+  if (s === '') return null;
+  const cleaned = s.replace(/[^0-9.]/g, '');
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseCommaList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+async function fetchProductsFromGoogleSheets() {
+  if (!SHEETS_API_KEY || !SHEETS_SPREADSHEET_ID) {
+    console.log("API ")
+    throw new Error('Missing REACT_APP_GOOGLE_SHEETS_API_KEY or REACT_APP_GOOGLE_SHEET_ID in .env');
+  }
+  
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(
+    SHEETS_SPREADSHEET_ID
+  )}/values/${encodeURIComponent(SHEETS_RANGE)}?key=${encodeURIComponent(SHEETS_API_KEY)}`;
+
+  const res = await fetch(url);
+  console.log(res);
+  
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Google Sheets request failed (${res.status}) ${text}`.trim());
+  }
+  const data = await res.json();
+  const rows = Array.isArray(data?.values) ? data.values : [];
+
+  const normalizedRows = rows
+    .map(r => (Array.isArray(r) ? r : [String(r ?? '')]))
+    .filter(r => r.some(cell => String(cell ?? '').trim() !== ''));
+
+  if (normalizedRows.length === 0) return [];
+
+  const maybeHeader = normalizedRows[0].map(v => String(v ?? '').trim().toLowerCase());
+  const hasHeader = maybeHeader.includes('name') || maybeHeader[0] === 'name';
+  const dataRows = hasHeader ? normalizedRows.slice(1) : normalizedRows;
+
+  return dataRows.map((row, index) => {
+    const cells = row.length === 1 ? row[0].split(',') : row;
+    const [name, description, price, offerPrice, offerEnabled, imgUrl, videoUrl] = [
+      cells[0],
+      cells[1],
+      cells[2],
+      cells[3],
+      cells[4],
+      cells[5],
+      cells[6],
+    ].map(v => String(v ?? '').trim());
+
+    const basePrice = parseNumber(price);
+    const offerPriceNumber = parseNumber(offerPrice);
+    const offerOn = parseOfferEnabled(offerEnabled);
+
+    const effectivePrice = offerOn && offerPriceNumber != null ? offerPriceNumber : basePrice ?? 0;
+    const originalPrice =
+      offerOn && basePrice != null && offerPriceNumber != null && offerPriceNumber < basePrice ? basePrice : null;
+
+    const imgUrls = parseCommaList(imgUrl);
+    const videoUrls = parseCommaList(videoUrl);
+
+    return {
+      id: `sheet-${index + 1}`,
+      name,
+      description,
+      price: effectivePrice,
+      originalPrice: originalPrice ?? undefined,
+      offerEnabled: offerOn,
+      offerPrice: offerPriceNumber ?? undefined,
+      imgUrls,
+      videoUrls,
+      image: imgUrls[0] || 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
+      category: 'All',
+      stock: 999,
+      inStock: true,
+      featured: index < 6,
+      rating: 4.8,
+      reviews: 0,
+    };
   });
+}
+
+export function StoreProvider({ children }) {
+  const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('orve_orders');
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
@@ -45,11 +133,33 @@ export function StoreProvider({ children }) {
   });
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState(null);
 
-  useEffect(() => { localStorage.setItem('orve_products', JSON.stringify(products)); }, [products]);
   useEffect(() => { localStorage.setItem('orve_orders', JSON.stringify(orders)); }, [orders]);
   useEffect(() => { localStorage.setItem('orve_reviews', JSON.stringify(reviews)); }, [reviews]);
   useEffect(() => { localStorage.setItem('orve_complaints', JSON.stringify(complaints)); }, [complaints]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        setProductsLoading(true);
+        setProductsError(null);
+        const sheetProducts = await fetchProductsFromGoogleSheets();
+        if (cancelled) return;
+        setProducts(sheetProducts);
+      } catch (e) {
+        if (!cancelled) setProductsError(e?.message || 'Failed to load products');
+      } finally {
+        if (!cancelled) setProductsLoading(false);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -69,39 +179,6 @@ export function StoreProvider({ children }) {
   const clearCart = () => setCart([]);
   const cartTotal = cart.reduce((sum, p) => sum + p.price * p.qty, 0);
   const cartCount = cart.reduce((sum, p) => sum + p.qty, 0);
-
-  const addProduct = (product) => {
-    const newP = { ...product, id: Date.now(), rating: 0, reviews: 0 };
-    setProducts(prev => [...prev, newP]);
-    showToast('Product added successfully ✨');
-  };
-
-  const updateProduct = (id, updates) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-  };
-
-  const deleteProduct = (id) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    showToast('Product deleted');
-  };
-
-  const toggleStock = (id) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, inStock: !p.inStock, stock: p.inStock ? 0 : 10 } : p));
-  };
-
-  const updateOrderStatus = (id, status) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    showToast(`Order ${id} updated to ${status}`);
-  };
-
-  const addOrder = (order) => {
-    const newOrder = { ...order, id: `ORV-${String(orders.length + 1).padStart(3, '0')}`, date: new Date().toISOString().split('T')[0] };
-    setOrders(prev => [...prev, newOrder]);
-    return newOrder.id;
-  };
-
-  const approveReview = (id) => setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: true } : r));
-  const deleteReview = (id) => setReviews(prev => prev.filter(r => r.id !== id));
   const addReview = (review) => {
     const newR = { ...review, id: Date.now(), date: new Date().toISOString().split('T')[0], approved: false };
     setReviews(prev => [...prev, newR]);
@@ -116,11 +193,10 @@ export function StoreProvider({ children }) {
   return (
     <StoreContext.Provider value={{
       products, orders, reviews, complaints, cart, toast,
+      productsLoading, productsError,
       cartTotal, cartCount,
       addToCart, removeFromCart, clearCart,
-      addProduct, updateProduct, deleteProduct, toggleStock,
-      updateOrderStatus, addOrder,
-      approveReview, deleteReview, addReview,
+      addReview,
       addComplaint, showToast
     }}>
       {children}
