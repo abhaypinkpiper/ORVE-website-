@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext';
 import Navbar from './components/Navbar';
@@ -10,7 +9,6 @@ import AboutPage from './pages/AboutPage';
 import TrackPage from './pages/TrackPage';
 import ReviewsPage from './pages/ReviewsPage';
 import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
 
 function Layout({ children }) {
   return (
@@ -28,7 +26,6 @@ export default function App() {
     <StoreProvider>
       <Router>
         <Routes>
-          <Route path="/admin" element={<AdminPage />} />
           <Route path="/" element={<Layout><HomePage /></Layout>} />
           <Route path="/shop" element={<Layout><ShopPage /></Layout>} />
           <Route path="/about" element={<Layout><AboutPage /></Layout>} />

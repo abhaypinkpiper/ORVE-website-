@@ -95,7 +95,7 @@ function ProductCard({ product }) {
 }
 
 export default function ShopPage() {
-  const { products } = useStore();
+  const { products, productsLoading, productsError } = useStore();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const defaultCategory = queryParams.get('category') || 'All';
@@ -202,7 +202,16 @@ export default function ShopPage() {
 
       {/* Products Grid */}
       <div style={{ maxWidth: '1300px', margin: '0 auto', padding: '60px 40px' }}>
-        {filtered.length === 0 ? (
+        {productsLoading && products.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '100px 0', color: '#A07830' }}>
+            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', fontWeight: 300 }}>Loading products…</p>
+          </div>
+        ) : productsError ? (
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#A07830' }}>
+            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.8rem', fontWeight: 300 }}>Couldn’t load products</p>
+            <p style={{ fontSize: '0.8rem', letterSpacing: '2px', marginTop: '12px', color: '#6B5540' }}>{productsError}</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '100px 0', color: '#A07830' }}>
             <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', fontWeight: 300 }}>No pieces found</p>
             <p style={{ fontSize: '0.8rem', letterSpacing: '2px', marginTop: '12px' }}>Try a different search or category</p>

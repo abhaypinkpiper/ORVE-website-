@@ -160,7 +160,8 @@ function ProductCard({ product }) {
 
 export default function HomePage() {
   const { products } = useStore();
-  const featured = products.filter(p => p.featured).slice(0, 6);
+  const featured = (products.filter(p => p.featured).length > 0 ? products.filter(p => p.featured) : products).slice(0, 6);
+  console.log(featured)
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
