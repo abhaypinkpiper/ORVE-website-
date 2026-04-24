@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
 function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
   const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
 
   const productHref = Number.isInteger(productIndex) && productIndex >= 0 ? `/product/${productIndex}` : null;
+  const goToProduct = () => {
+    if (productHref) navigate(productHref);
+  };
 
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={goToProduct}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') goToProduct();
+      }}
+      role={productHref ? 'button' : undefined}
+      tabIndex={productHref ? 0 : undefined}
       style={{
         background: '#FFFDF7',
         overflow: 'hidden',
         transition: 'all 0.4s ease',
         transform: hovered ? 'translateY(-8px)' : 'translateY(0)',
         boxShadow: hovered ? '0 20px 60px rgba(44,26,14,0.15)' : 'none',
+        cursor: productHref ? 'pointer' : 'default',
       }}
     >
       <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
@@ -78,13 +89,14 @@ function ProductCard({ product, productIndex }) {
           }}>
             <button
               className="btn-gold"
-              onClick={() => addToCart(product)}
+              onClick={(e) => { e.stopPropagation(); addToCart(product); }}
               style={{ fontSize: '0.65rem', padding: '10px 28px', letterSpacing: '2px' }}
             >Add to Bag</button>
             <a
               href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
               target="_blank" rel="noreferrer"
               style={{ textDecoration: 'none' }}
+              onClick={(e) => e.stopPropagation()}
             >
               <button className="btn-outline"
                 style={{ fontSize: '0.65rem', padding: '10px 28px', letterSpacing: '2px', borderColor: '#E8D5A3', color: '#E8D5A3' }}>

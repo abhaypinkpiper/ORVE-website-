@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
 function GoldParticles() {
@@ -79,14 +79,24 @@ function TypewriterText({ texts, style }) {
 function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
   const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
   const productHref = Number.isInteger(productIndex) && productIndex >= 0 ? `/product/${productIndex}` : null;
+  const goToProduct = () => {
+    if (productHref) navigate(productHref);
+  };
 
   return (
     <div
       className="product-card"
-      style={{ borderRadius: '2px', overflow: 'hidden' }}
+      style={{ borderRadius: '2px', overflow: 'hidden', cursor: productHref ? 'pointer' : 'default' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={goToProduct}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') goToProduct();
+      }}
+      role={productHref ? 'button' : undefined}
+      tabIndex={productHref ? 0 : undefined}
     >
       <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4' }}>
         {productHref ? (
@@ -138,13 +148,15 @@ function ProductCard({ product, productIndex }) {
           }}>
             {product.inStock ? (
               <>
-                <button className="btn-gold" onClick={() => addToCart(product)}
+                <button className="btn-gold" onClick={(e) => { e.stopPropagation(); addToCart(product); }}
                   style={{ fontSize: '0.65rem', padding: '10px 24px', letterSpacing: '2px' }}>
                   Add to Bag
                 </button>
                 <a href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20buy%20${encodeURIComponent(product.name)}%20(₹${product.price}).%20Please%20confirm%20availability.`}
                   target="_blank" rel="noreferrer"
-                  style={{ textDecoration: 'none' }}>
+                  style={{ textDecoration: 'none' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button className="btn-outline" style={{ fontSize: '0.65rem', padding: '10px 24px', letterSpacing: '2px', borderColor: '#E8D5A3', color: '#E8D5A3' }}>
                     Buy on WhatsApp
                   </button>
