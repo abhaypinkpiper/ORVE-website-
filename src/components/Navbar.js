@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useStore } from '../context/StoreContext';
 
 export default function Navbar() {
@@ -7,7 +8,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { cart, cartCount, cartTotal, removeFromCart } = useStore();
-  const location = useLocation();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -15,7 +16,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); setCartOpen(false); }, [location]);
+  useEffect(() => {
+    setMenuOpen(false);
+    setCartOpen(false);
+  }, [router.asPath]);
 
   const navLinks = [
     { label: 'Home', path: '/' },
@@ -39,7 +43,7 @@ export default function Navbar() {
     <>
       <nav style={navStyle}>
         {/* Logo */}
-        <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <span style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: '1.8rem',
@@ -57,15 +61,15 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div style={{ display: 'flex', gap: '36px', alignItems: 'center' }} className="desktop-nav">
           {navLinks.map(link => (
-            <Link key={link.path} to={link.path} style={{
+            <Link key={link.path} href={link.path} style={{
               textDecoration: 'none',
               fontFamily: "'Raleway', sans-serif",
               fontSize: '0.7rem',
               fontWeight: 600,
               letterSpacing: '3px',
               textTransform: 'uppercase',
-              color: location.pathname === link.path ? '#C9A84C' : '#2C1A0E',
-              borderBottom: location.pathname === link.path ? '1px solid #C9A84C' : '1px solid transparent',
+              color: router.asPath === link.path ? '#C9A84C' : '#2C1A0E',
+              borderBottom: router.asPath === link.path ? '1px solid #C9A84C' : '1px solid transparent',
               paddingBottom: '2px',
               transition: 'all 0.3s ease',
             }}>{link.label}</Link>
@@ -125,13 +129,13 @@ export default function Navbar() {
             borderLeft: '1px solid rgba(201,168,76,0.3)',
           }}>
             {navLinks.map(link => (
-              <Link key={link.path} to={link.path} style={{
+              <Link key={link.path} href={link.path} style={{
                 textDecoration: 'none',
                 fontFamily: "'Cormorant Garamond', serif",
                 fontSize: '1.8rem',
                 fontWeight: 300,
                 letterSpacing: '3px',
-                color: location.pathname === link.path ? '#C9A84C' : '#2C1A0E',
+                color: router.asPath === link.path ? '#C9A84C' : '#2C1A0E',
               }}>{link.label}</Link>
             ))}
             <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(201,168,76,0.3)', paddingTop: '24px' }}>

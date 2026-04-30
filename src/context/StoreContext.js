@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StoreContext = createContext();
 
-const SHEETS_API_KEY = process.env.REACT_APP_GOOGLE_SHEETS_API_KEY;
-const SHEETS_SPREADSHEET_ID = process.env.REACT_APP_GOOGLE_SHEET_ID;
-const SHEETS_RANGE = process.env.REACT_APP_GOOGLE_SHEET_RANGE || 'Products!A2:G';
+const SHEETS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY || process.env.REACT_APP_GOOGLE_SHEETS_API_KEY;
+const SHEETS_SPREADSHEET_ID = process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID || process.env.REACT_APP_GOOGLE_SHEET_ID;
+const SHEETS_RANGE = process.env.NEXT_PUBLIC_GOOGLE_SHEET_RANGE || process.env.REACT_APP_GOOGLE_SHEET_RANGE || 'Products!A2:G';
 
 const INITIAL_ORDERS = [
   { id: "ORV-001", customer: "Priya Sharma", phone: "9876543210", product: "Celeste Layered Necklace", amount: 1499, status: "Delivered", date: "2025-04-10", address: "Mumbai, Maharashtra" },
@@ -18,6 +18,14 @@ const INITIAL_REVIEWS = [
   { id: 2, name: "Sneha M.", product: "Lumière Drop Earrings", rating: 5, comment: "These are my go-to earrings now. Light, beautiful, and haven't tarnished even after 3 months!", date: "2025-04-08", approved: true },
   { id: 3, name: "Riya K.", product: "Maharani Jhumka Set", rating: 5, comment: "Wore these for Diwali and they were the talk of the party. Luxury at an amazing price.", date: "2025-04-01", approved: true },
 ];
+
+function safeJsonParse(value, fallback) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
 
 function parseOfferEnabled(value) {
   if (typeof value === 'boolean') return value;
@@ -44,8 +52,7 @@ function parseCommaList(value) {
 
 async function fetchProductsFromGoogleSheets() {
   if (!SHEETS_API_KEY || !SHEETS_SPREADSHEET_ID) {
-    console.log("API ")
-    throw new Error('Missing REACT_APP_GOOGLE_SHEETS_API_KEY or REACT_APP_GOOGLE_SHEET_ID in .env');
+    throw new Error('Missing NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY or NEXT_PUBLIC_GOOGLE_SHEET_ID in .env');
   }
   
 
@@ -54,7 +61,6 @@ async function fetchProductsFromGoogleSheets() {
   )}/values/${encodeURIComponent(SHEETS_RANGE)}?key=${encodeURIComponent(SHEETS_API_KEY)}`;
 
   const res = await fetch(url);
-  console.log(res);
   
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -119,26 +125,39 @@ async function fetchProductsFromGoogleSheets() {
 
 export function StoreProvider({ children }) {
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('orve_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-  });
-  const [reviews, setReviews] = useState(() => {
-    const saved = localStorage.getItem('orve_reviews');
-    return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
-  });
-  const [complaints, setComplaints] = useState(() => {
-    const saved = localStorage.getItem('orve_complaints');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  const [complaints, setComplaints] = useState([]);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState(null);
 
-  useEffect(() => { localStorage.setItem('orve_orders', JSON.stringify(orders)); }, [orders]);
-  useEffect(() => { localStorage.setItem('orve_reviews', JSON.stringify(reviews)); }, [reviews]);
-  useEffect(() => { localStorage.setItem('orve_complaints', JSON.stringify(complaints)); }, [complaints]);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedOrders = window.localStorage.getItem('orve_orders');
+    const savedReviews = window.localStorage.getItem('orve_reviews');
+    const savedComplaints = window.localStorage.getItem('orve_complaints');
+
+    if (savedOrders) setOrders(safeJsonParse(savedOrders, INITIAL_ORDERS));
+    if (savedReviews) setReviews(safeJsonParse(savedReviews, INITIAL_REVIEWS));
+    if (savedComplaints) setComplaints(safeJsonParse(savedComplaints, []));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('orve_orders', JSON.stringify(orders));
+  }, [orders]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('orve_reviews', JSON.stringify(reviews));
+  }, [reviews]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('orve_complaints', JSON.stringify(complaints));
+  }, [complaints]);
 
   useEffect(() => {
     let cancelled = false;

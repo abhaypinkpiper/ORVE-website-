@@ -10,6 +10,7 @@ import TrackPage from './pages/TrackPage';
 import ReviewsPage from './pages/ReviewsPage';
 import ContactPage from './pages/ContactPage';
 import ProductPage from './pages/ProductPage';
+import UploadPage from './pages/UploadPage';
 
 function Layout({ children }) {
   return (
@@ -17,7 +18,7 @@ function Layout({ children }) {
       <Navbar />
       <main>{children}</main>
       <Footer />
-      <WAFloat />
+      <WAFloat />2
     </>
   );
 }
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/" element={<Layout><HomePage /></Layout>} />
           <Route path="/shop" element={<Layout><ShopPage /></Layout>} />
           <Route path="/product/:index" element={<Layout><ProductPage /></Layout>} />
+          <Route path="/upload" element={<Layout><UploadPage /></Layout>} />
           <Route path="/about" element={<Layout><AboutPage /></Layout>} />
           <Route path="/track" element={<Layout><TrackPage /></Layout>} />
           <Route path="/reviews" element={<Layout><ReviewsPage /></Layout>} />
