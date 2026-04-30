@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -49,7 +49,7 @@ export default function Footer() {
             { label: 'Reviews', path: '/reviews' },
             { label: 'Contact', path: '/contact' },
           ].map(link => (
-            <Link key={link.path} to={link.path} style={{
+            <Link key={link.path} href={link.path} style={{
               display: 'block', textDecoration: 'none', color: '#B8A88A',
               fontSize: '0.85rem', lineHeight: 2.4, letterSpacing: '1px',
               transition: 'color 0.3s',
@@ -65,7 +65,7 @@ export default function Footer() {
         <div>
           <h3 style={{ fontSize: '0.65rem', letterSpacing: '4px', color: '#C9A84C', fontWeight: 600, textTransform: 'uppercase', marginBottom: '24px' }}>Collections</h3>
           {['Rings', 'Necklaces', 'Earrings', 'Bracelets', 'Sets', 'New Arrivals'].map(cat => (
-            <Link key={cat} to={`/shop?category=${cat}`} style={{
+            <Link key={cat} href={`/shop?category=${encodeURIComponent(cat)}`} style={{
               display: 'block', textDecoration: 'none', color: '#B8A88A',
               fontSize: '0.85rem', lineHeight: 2.4, letterSpacing: '1px',
               transition: 'color 0.3s',
