@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { appConfig } from '../config/appConfig';
+import Link from 'next/link';
 
 export default function ReviewsPage() {
   const { reviews, addReview, addComplaint, products } = useStore();

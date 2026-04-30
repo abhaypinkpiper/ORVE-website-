@@ -74,9 +74,9 @@ export default function ContactPage() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.6rem', fontWeight: 400, letterSpacing: '3px', color: '#2C1A0E', marginBottom: '8px' }}>{c.title}</h3>
               <p style={{ fontSize: '0.75rem', color: '#B8A88A', letterSpacing: '1px', marginBottom: '16px' }}>{c.sub}</p>
               <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#C9A84C', marginBottom: '30px', fontWeight: 500 }}>{c.detail}</p>
-              <a href={c.link} target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.65rem', letterSpacing: '3px' }}>
+              <Link href={c.link} target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.65rem', letterSpacing: '3px' }}>
                 {c.label}
-              </a>
+              </Link>
             </div>
           ))}
         </div>

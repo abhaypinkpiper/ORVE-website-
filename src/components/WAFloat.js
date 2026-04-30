@@ -1,10 +1,11 @@
 import React from 'react';
 import { appConfig } from '../config/appConfig';
+import Link from 'next/link';
 
 export default function WAFloat() {
   return (
     <Link
-      href={appConfig.whatsappUrl + '?text=Hi%20ORVÉ!%20I%27m%20interested%20in%20your%20jewellery.%20Please%20help%20me.'}
+      href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%27m%20interested%20in%20your%20jewellery.%20Please%20help%20me.`}
       target="_blank"
       rel="noreferrer"
       className="wa-float"

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
+import Link from 'next/link';
 import { useStore } from '../context/StoreContext';
 import { appConfig } from '../config/appConfig';
 

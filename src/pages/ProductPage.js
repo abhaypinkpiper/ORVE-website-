@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import Link from 'next/link';
 import { useStore } from '../context/StoreContext';
 import { appConfig } from '../config/appConfig';
 
