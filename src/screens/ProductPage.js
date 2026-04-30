@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
 
 export default function ProductPage() {
   const router = useRouter();
@@ -158,16 +159,14 @@ export default function ProductPage() {
                 <button className="btn-gold" onClick={() => addToCart(product)} style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
                   Add to Bag
                 </button>
-                <a
-                  href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
-                  target="_blank"
-                  rel="noreferrer"
+                <Link
+                  href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
                   style={{ textDecoration: 'none' }}
                 >
                   <button className="btn-outline" style={{ fontSize: '0.7rem', letterSpacing: '3px', borderColor: '#C9A84C', color: '#A07830' }}>
                     WhatsApp Order
                   </button>
-                </a>
+                </Link>
               </div>
             </div>
 

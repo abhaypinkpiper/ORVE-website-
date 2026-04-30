@@ -1,4 +1,5 @@
 import React from 'react';
+import { appConfig } from '../config/appConfig';
 
 export default function ContactPage() {
   return (
@@ -29,7 +30,7 @@ export default function ContactPage() {
               icon: '💬',
               title: 'WhatsApp',
               sub: 'Fastest response — within hours',
-              link: 'https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20know%20more%20about%20your%20jewellery.',
+              link: appConfig.whatsappUrl + '?text=Hi%20ORVÉ!%20I%20want%20to%20know%20more%20about%20your%20jewellery.',
               label: 'Chat Now',
               detail: '+91 79774 59392',
             },
@@ -73,9 +74,9 @@ export default function ContactPage() {
               <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.6rem', fontWeight: 400, letterSpacing: '3px', color: '#2C1A0E', marginBottom: '8px' }}>{c.title}</h3>
               <p style={{ fontSize: '0.75rem', color: '#B8A88A', letterSpacing: '1px', marginBottom: '16px' }}>{c.sub}</p>
               <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#C9A84C', marginBottom: '30px', fontWeight: 500 }}>{c.detail}</p>
-              <a href={c.link} target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.65rem', letterSpacing: '3px' }}>
+              <Link href={c.link} target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.65rem', letterSpacing: '3px' }}>
                 {c.label}
-              </a>
+              </Link>
             </div>
           ))}
         </div>

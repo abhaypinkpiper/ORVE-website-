@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
+import Link from 'next/link';
 
 const STATUS_STEPS = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
 
@@ -135,10 +137,10 @@ export default function TrackPage() {
               </div>
             </div>
 
-            <a href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20need%20help%20with%20my%20order%20${result.id}`}
+            <Link href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20need%20help%20with%20my%20order%20${result.id}`}
               target="_blank" rel="noreferrer" className="btn-gold" style={{ display: 'block', textAlign: 'center', fontSize: '0.7rem', letterSpacing: '3px' }}>
               Need Help? Chat on WhatsApp
-            </a>
+            </Link>
           </div>
         )}
         <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>

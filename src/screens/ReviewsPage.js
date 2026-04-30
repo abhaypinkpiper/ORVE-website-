@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
+import Link from 'next/link';
 
 export default function ReviewsPage() {
   const { reviews, addReview, addComplaint, products } = useStore();
@@ -240,15 +242,15 @@ export default function ReviewsPage() {
                 <button className="btn-gold" onClick={handleComplaintSubmit} style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
                   Submit Complaint
                 </button>
-                <a
-                  href="https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20have%20a%20complaint%20about%20my%20order."
+                <Link
+                  href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20have%20a%20complaint%20about%20my%20order.`}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-outline"
                   style={{ fontSize: '0.7rem', letterSpacing: '3px' }}
                 >
                   Chat on WhatsApp
-                </a>
+                </Link>
               </div>
             </div>
           </div>
