@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { appConfig } from '../config/appConfig';
 
 export default function AboutPage() {
   return (
@@ -133,9 +134,9 @@ export default function AboutPage() {
           <Link href="/shop" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
             Shop Now
           </Link>
-          <a href="https://wa.me/917977459392" target="_blank" rel="noreferrer" className="btn-outline" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
+          <Link href={appConfig.whatsappUrl} className="btn-outline" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
             Chat with Us
-          </a>
+          </Link>
         </div>
       </section>
     </div>

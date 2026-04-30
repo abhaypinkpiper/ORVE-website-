@@ -1,4 +1,5 @@
 import React from 'react';
+import { appConfig } from '../config/appConfig';
 
 export default function ContactPage() {
   return (
@@ -24,7 +25,7 @@ export default function ContactPage() {
               icon: '💬',
               title: 'WhatsApp',
               sub: 'Fastest response — within hours',
-              link: 'https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20know%20more%20about%20your%20jewellery.',
+              link: appConfig.whatsappUrl + '?text=Hi%20ORVÉ!%20I%20want%20to%20know%20more%20about%20your%20jewellery.',
               label: 'Chat Now',
               detail: '+91 79774 59392',
             },
@@ -32,7 +33,7 @@ export default function ContactPage() {
               icon: '📸',
               title: 'Instagram',
               sub: 'DM us for queries & custom orders',
-              link: 'https://instagram.com/ORVE.jewels',
+              link: appConfig.instagramUrl,
               label: 'Follow & DM',
               detail: '@ORVE.jewels',
             },

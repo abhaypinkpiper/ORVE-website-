@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
 
 function GoldParticles() {
   const canvasRef = useRef(null);
@@ -200,8 +201,8 @@ function ProductCard({ product, productIndex }) {
                 >
                   Add to Bag
                 </button>
-                <a
-                  href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20buy%20${encodeURIComponent(product.name)}%20(₹${product.price}).%20Please%20confirm%20availability.`}
+                <Link
+                  href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20want%20to%20buy%20${encodeURIComponent(product.name)}%20(₹${product.price}).%20Please%20confirm%20availability.`}
                   target="_blank"
                   rel="noreferrer"
                   style={{ textDecoration: 'none' }}
@@ -219,7 +220,7 @@ function ProductCard({ product, productIndex }) {
                   >
                     Buy on WhatsApp
                   </button>
-                </a>
+                </Link>
               </>
             ) : (
               <p style={{ color: '#E8D5A3', fontSize: '0.75rem', letterSpacing: '2px' }}>SOLD OUT</p>
@@ -416,15 +417,15 @@ export default function HomePage() {
             <Link href="/shop" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px', padding: '16px 44px' }}>
               Explore Collection
             </Link>
-            <a
-              href="https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%27m%20interested%20in%20your%20jewellery"
+            <Link
+              href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%27m%20interested%20in%20your%20jewellery`}
               target="_blank"
               rel="noreferrer"
               className="btn-outline"
               style={{ fontSize: '0.7rem', letterSpacing: '3px', padding: '16px 44px', borderColor: '#C9A84C', color: '#C9A84C' }}
             >
               Shop on WhatsApp
-            </a>
+            </Link>
           </div>
 
           {/* Scroll indicator */}

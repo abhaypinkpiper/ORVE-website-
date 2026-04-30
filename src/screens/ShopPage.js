@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
 
 function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
@@ -133,8 +134,8 @@ function ProductCard({ product, productIndex }) {
             >
               Add to Bag
             </button>
-            <a
-              href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
+            <Link
+              href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
               target="_blank"
               rel="noreferrer"
               style={{ textDecoration: 'none' }}
@@ -146,7 +147,7 @@ function ProductCard({ product, productIndex }) {
               >
                 WhatsApp Order
               </button>
-            </a>
+            </Link>
           </div>
         )}
       </div>
@@ -336,15 +337,15 @@ export default function ShopPage() {
           Can't find what you're looking for?
         </p>
         <p style={{ fontSize: '0.8rem', letterSpacing: '2px', color: '#A07830', marginBottom: '30px' }}>Chat with us on WhatsApp for custom orders</p>
-        <a
-          href="https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%27m%20looking%20for%20a%20specific%20jewellery%20piece."
+        <Link
+          href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%27m%20looking%20for%20a%20specific%20jewellery%20piece.`}
           target="_blank"
           rel="noreferrer"
           className="btn-gold"
           style={{ fontSize: '0.7rem', letterSpacing: '3px' }}
         >
           Chat on WhatsApp
-        </a>
+        </Link>
       </div>
     </div>
   );

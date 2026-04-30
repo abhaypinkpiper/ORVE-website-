@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
+import { appConfig } from '../config/appConfig';
 
 function ProductCard({ product, productIndex }) {
   const { addToCart } = useStore();
@@ -92,8 +93,8 @@ function ProductCard({ product, productIndex }) {
               onClick={(e) => { e.stopPropagation(); addToCart(product); }}
               style={{ fontSize: '0.65rem', padding: '10px 28px', letterSpacing: '2px' }}
             >Add to Bag</button>
-            <a
-              href={`https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability.`}
+            <Link
+              href={`${appConfig.whatsappUrl}?text=Hi%20ORVÉ!%20I%20want%20to%20order:%20${encodeURIComponent(product.name)}%20at%20₹${product.price}.%20Please%20confirm%20availability`}
               target="_blank" rel="noreferrer"
               style={{ textDecoration: 'none' }}
               onClick={(e) => e.stopPropagation()}
@@ -102,7 +103,7 @@ function ProductCard({ product, productIndex }) {
                 style={{ fontSize: '0.65rem', padding: '10px 28px', letterSpacing: '2px', borderColor: '#E8D5A3', color: '#E8D5A3' }}>
                 WhatsApp Order
               </button>
-            </a>
+            </Link>
           </div>
         )}
       </div>
@@ -266,9 +267,9 @@ export default function ShopPage() {
       <div style={{ background: '#EDE0C8', padding: '80px 40px', textAlign: 'center' }}>
         <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', fontWeight: 300, letterSpacing: '3px', color: '#2C1A0E', marginBottom: '8px' }}>Can't find what you're looking for?</p>
         <p style={{ fontSize: '0.8rem', letterSpacing: '2px', color: '#A07830', marginBottom: '30px' }}>Chat with us on WhatsApp for custom orders</p>
-        <a href="https://wa.me/917977459392?text=Hi%20ORVÉ!%20I%27m%20looking%20for%20a%20specific%20jewellery%20piece." target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
+        <Link href={appConfig.whatsappUrl + '?text=Hi%20ORVÉ!%20I%27m%20looking%20for%20a%20specific%20jewellery%20piece.'} target="_blank" rel="noreferrer" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>
           Chat on WhatsApp
-        </a>
+        </Link> 
       </div>
     </div>
   );

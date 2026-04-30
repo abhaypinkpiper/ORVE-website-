@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { appConfig } from '../config/appConfig';
 
 export default function AboutPage() {
   return (
@@ -101,7 +102,7 @@ export default function AboutPage() {
         </h2>
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/shop" className="btn-gold" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>Shop Now</Link>
-          <a href="https://wa.me/917977459392" target="_blank" rel="noreferrer" className="btn-outline" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>Chat with Us</a>
+          <Link href={appConfig.whatsappUrl} target="_blank" rel="noreferrer" className="btn-outline" style={{ fontSize: '0.7rem', letterSpacing: '3px' }}>Chat with Us</Link> 
         </div>
       </section>
     </div>
