@@ -1,5 +1,6 @@
 import React from 'react';
 import { appConfig } from '../config/appConfig';
+import Link from 'next/link';
 
 export default function ContactPage() {
   return (
