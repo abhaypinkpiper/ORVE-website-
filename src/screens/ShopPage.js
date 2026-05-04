@@ -14,6 +14,15 @@ function ProductCard({ product, productIndex }) {
     if (productHref) router.push(productHref);
   };
 
+  const truncate = (value, max) => {
+    const s = String(value ?? '').trim();
+    if (s.length <= max) return s;
+    return `${s.slice(0, Math.max(0, max - 1))}…`;
+  };
+
+  const title = truncate(product?.name, 60);
+  const desc = truncate(product?.description, 140);
+
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -31,6 +40,9 @@ function ProductCard({ product, productIndex }) {
         transform: hovered ? 'translateY(-8px)' : 'translateY(0)',
         boxShadow: hovered ? '0 20px 60px rgba(44,26,14,0.15)' : 'none',
         cursor: productHref ? 'pointer' : 'default',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
@@ -151,26 +163,75 @@ function ProductCard({ product, productIndex }) {
           </div>
         )}
       </div>
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
         <p style={{ fontSize: '0.55rem', letterSpacing: '3px', color: '#A07830', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px' }}>{product.category}</p>
         {productHref ? (
           <Link href={productHref} style={{ textDecoration: 'none', color: 'inherit' }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 500, letterSpacing: '1px', marginBottom: '10px' }}>{product.name}</h3>
+            <h3
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '1.15rem',
+                fontWeight: 500,
+                letterSpacing: '1px',
+                marginBottom: '10px',
+                lineHeight: 1.25,
+                minHeight: '2.5em',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {title}
+            </h3>
           </Link>
         ) : (
-          <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 500, letterSpacing: '1px', marginBottom: '10px' }}>{product.name}</h3>
+          <h3
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '1.15rem',
+              fontWeight: 500,
+              letterSpacing: '1px',
+              marginBottom: '10px',
+              lineHeight: 1.25,
+              minHeight: '2.5em',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </h3>
         )}
-        <p style={{ fontSize: '0.78rem', color: '#6B5540', lineHeight: 1.7, marginBottom: '12px' }}>{product.description}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', color: '#C9A84C', fontWeight: 600 }}>₹{product.price.toLocaleString()}</span>
-          {product.originalPrice != null && (
-            <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>₹{product.originalPrice.toLocaleString()}</span>
-          )}
-        </div>
-        <div style={{ color: '#C9A84C', fontSize: '0.8rem' }}>
-          {'★'.repeat(Math.round(product.rating))}
-          {'☆'.repeat(5 - Math.round(product.rating))}
-          <span style={{ color: '#B8A88A', fontSize: '0.7rem', marginLeft: '6px' }}>({product.reviews})</span>
+        <p
+          style={{
+            fontSize: '0.78rem',
+            color: '#6B5540',
+            lineHeight: 1.7,
+            marginBottom: '12px',
+            minHeight: '3.4em',
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden',
+          }}
+        >
+          {desc}
+        </p>
+
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', color: '#C9A84C', fontWeight: 600 }}>₹{product.price.toLocaleString()}</span>
+            {product.originalPrice != null && (
+              <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>₹{product.originalPrice.toLocaleString()}</span>
+            )}
+          </div>
+          <div style={{ color: '#C9A84C', fontSize: '0.8rem' }}>
+            {'★'.repeat(Math.round(product.rating))}
+            {'☆'.repeat(5 - Math.round(product.rating))}
+            <span style={{ color: '#B8A88A', fontSize: '0.7rem', marginLeft: '6px' }}>({product.reviews})</span>
+          </div>
         </div>
       </div>
     </div>
@@ -350,4 +411,3 @@ export default function ShopPage() {
     </div>
   );
 }
-

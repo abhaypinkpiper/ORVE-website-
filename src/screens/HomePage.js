@@ -98,10 +98,25 @@ function ProductCard({ product, productIndex }) {
     if (productHref) router.push(productHref);
   };
 
+  const truncate = (value, max) => {
+    const s = String(value ?? '').trim();
+    if (s.length <= max) return s;
+    return `${s.slice(0, Math.max(0, max - 1))}…`;
+  };
+
+  const title = truncate(product?.name, 60);
+
   return (
     <div
       className="product-card"
-      style={{ borderRadius: '2px', overflow: 'hidden', cursor: productHref ? 'pointer' : 'default' }}
+      style={{
+        borderRadius: '2px',
+        overflow: 'hidden',
+        cursor: productHref ? 'pointer' : 'default',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={goToProduct}
@@ -228,7 +243,7 @@ function ProductCard({ product, productIndex }) {
           </div>
         )}
       </div>
-      <div style={{ padding: '20px 16px', background: '#FFFDF7' }}>
+      <div style={{ padding: '20px 16px', background: '#FFFDF7', display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
         <p
           style={{
             fontSize: '0.6rem',
@@ -254,9 +269,15 @@ function ProductCard({ product, productIndex }) {
                 fontWeight: 500,
                 marginBottom: '8px',
                 letterSpacing: '1px',
+                lineHeight: 1.25,
+                minHeight: '2.5em',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
               }}
             >
-              {product.name}
+              {title}
             </h3>
           </Link>
         ) : (
@@ -267,31 +288,39 @@ function ProductCard({ product, productIndex }) {
               fontWeight: 500,
               marginBottom: '8px',
               letterSpacing: '1px',
+              lineHeight: 1.25,
+              minHeight: '2.5em',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
             }}
           >
-            {product.name}
+            {title}
           </h3>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '1.2rem',
-              color: '#C9A84C',
-              fontWeight: 600,
-            }}
-          >
-            ₹{product.price.toLocaleString()}
-          </span>
-          {product.originalPrice && (
-            <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>
-              ₹{product.originalPrice.toLocaleString()}
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '1.2rem',
+                color: '#C9A84C',
+                fontWeight: 600,
+              }}
+            >
+              ₹{product.price.toLocaleString()}
             </span>
-          )}
-        </div>
-        <div style={{ marginTop: '6px', color: '#C9A84C', fontSize: '0.8rem' }}>
-          {'★'.repeat(Math.round(product.rating))}{' '}
-          <span style={{ color: '#B8A88A', fontSize: '0.7rem' }}>({product.reviews})</span>
+            {product.originalPrice && (
+              <span style={{ fontSize: '0.85rem', color: '#B8A88A', textDecoration: 'line-through' }}>
+                ₹{product.originalPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
+          <div style={{ marginTop: '6px', color: '#C9A84C', fontSize: '0.8rem' }}>
+            {'★'.repeat(Math.round(product.rating))}{' '}
+            <span style={{ color: '#B8A88A', fontSize: '0.7rem' }}>({product.reviews})</span>
+          </div>
         </div>
       </div>
     </div>
@@ -661,4 +690,3 @@ export default function HomePage() {
     </div>
   );
 }
-
