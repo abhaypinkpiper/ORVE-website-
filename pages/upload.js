@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
 import axios from "axios";
 
-async function uploadWithProgress({ url, body, onProgress }) {
+async function uploadWithProgress({ url, body, headers, onProgress }) {
   const res = await axios.put(url, body, {
+    headers,
     onUploadProgress: (evt) => {
       const total = evt?.total;
       const loaded = evt?.loaded;
@@ -105,6 +106,7 @@ export default function UploadPage() {
         const res = await uploadWithProgress({
           url: uploadUrl,
           body: file,
+          headers: uploadHeaders,
           onProgress: (p) =>
             setUploads((prev) =>
               prev.map((u, idx) => (idx === i ? { ...u, progress: p } : u)),
@@ -174,7 +176,7 @@ export default function UploadPage() {
             backgroundClip: "text",
           }}
         >
-          Upload Images
+          Upload Media
         </h1>
         <p
           style={{
@@ -184,7 +186,7 @@ export default function UploadPage() {
             marginTop: "12px",
           }}
         >
-          Upload directly to S3 using a presigned URL
+          Upload images or videos directly to S3 using a presigned URL
         </p>
       </div>
 
@@ -214,7 +216,7 @@ export default function UploadPage() {
 
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             multiple
             disabled={busy}
             onChange={(e) => {

@@ -78,9 +78,9 @@ export default async function handler(req, res) {
     if (
       typeof size === "number" &&
       Number.isFinite(size) &&
-      size > 25 * 1024 * 1024
+      size > 50 * 1024 * 1024
     ) {
-      return res.status(413).json({ error: "File too large (max 25MB)" });
+      return res.status(413).json({ error: "File too large (max 50MB)" });
     }
 
     const data = await getPresignedUrl({ fileName, contentType });

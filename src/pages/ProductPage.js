@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Link from 'next/link';
+import ReactPlayer from 'react-player';
 import { useStore } from '../context/StoreContext';
 import { appConfig } from '../config/appConfig';
 
@@ -23,7 +24,21 @@ export default function ProductPage() {
     return list.map(s => String(s || '').trim()).filter(Boolean);
   }, [product]);
 
-  const [activeImage, setActiveImage] = useState(0);
+  const mediaItems = useMemo(() => {
+    const items = [
+      ...images.map((url) => ({ type: 'image', url })),
+      ...videoUrls.map((url) => ({ type: 'video', url })),
+    ];
+    const seen = new Set();
+    return items.filter((it) => {
+      const key = `${it.type}:${it.url}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [images, videoUrls]);
+
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   if (productsLoading && products.length === 0) {
     return (
@@ -69,7 +84,7 @@ export default function ProductPage() {
     Number.isFinite(product.price) &&
     product.originalPrice > product.price;
 
-  const activeImageUrl = images[activeImage] || images[0];
+  const activeMedia = mediaItems[activeMediaIndex] || mediaItems[0];
 
   return (
     <div style={{ minHeight: '100vh', paddingTop: '90px', background: '#F5EFE0' }}>
@@ -87,27 +102,27 @@ export default function ProductPage() {
         <div className="product-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '36px' }}>
           <div>
             <div style={{ background: '#FFFDF7', overflow: 'hidden' }}>
-              {activeImageUrl ? (
-                <img
-                  src={activeImageUrl}
-                  alt={product.name}
-                  style={{ width: '100%', height: 'auto', display: 'block' }}
-                />
+              {activeMedia?.type === 'video' && activeMedia.url ? (
+                <div style={{ aspectRatio: '16 / 9', background: '#000' }}>
+                  <ReactPlayer url={activeMedia.url} playing controls width="100%" height="100%" />
+                </div>
+              ) : activeMedia?.type === 'image' && activeMedia.url ? (
+                <img src={activeMedia.url} alt={product.name} style={{ width: '100%', height: 'auto', display: 'block' }} />
               ) : (
                 <div style={{ padding: '120px 0', textAlign: 'center', color: '#A07830' }}>
-                  <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.6rem', fontWeight: 300 }}>No image</p>
+                  <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.6rem', fontWeight: 300 }}>No media</p>
                 </div>
               )}
             </div>
 
-            {images.length > 1 && (
+            {mediaItems.length > 1 && (
               <div style={{ marginTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {images.map((url, i) => (
+                {mediaItems.map((it, i) => (
                   <button
-                    key={url}
-                    onClick={() => setActiveImage(i)}
+                    key={`${it.type}:${it.url}`}
+                    onClick={() => setActiveMediaIndex(i)}
                     style={{
-                      border: i === activeImage ? '1px solid #C9A84C' : '1px solid rgba(201,168,76,0.25)',
+                      border: i === activeMediaIndex ? '1px solid #C9A84C' : '1px solid rgba(201,168,76,0.25)',
                       background: '#FFFDF7',
                       padding: 0,
                       cursor: 'pointer',
@@ -116,30 +131,15 @@ export default function ProductPage() {
                       overflow: 'hidden',
                     }}
                   >
-                    <img src={url} alt={`${product.name} ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    {it.type === 'image' ? (
+                      <img src={it.url} alt={`${product.name} ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: '#2C1A0E', color: '#E8D5A3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '1.2rem' }}>▶</span>
+                      </div>
+                    )}
                   </button>
                 ))}
-              </div>
-            )}
-
-            {videoUrls.length > 0 && (
-              <div style={{ marginTop: '22px' }}>
-                <p style={{ fontSize: '0.6rem', letterSpacing: '4px', color: '#A07830', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
-                  Videos
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {videoUrls.map((url, i) => (
-                    <a
-                      key={`${url}-${i}`}
-                      href={url}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ textDecoration: 'none', color: '#2C1A0E', fontSize: '0.85rem', letterSpacing: '1px' }}
-                    >
-                      Watch video {i + 1} →
-                    </a>
-                  ))}
-                </div>
               </div>
             )}
           </div>
